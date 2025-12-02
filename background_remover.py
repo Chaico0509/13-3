@@ -9,16 +9,12 @@ def overlay_image(background, foreground, scale, pos_x, pos_y):
     bg = background.convert("RGBA")
     fg = foreground.convert("RGBA")
 
-    # -------------------------
-    # ① 전경 이미지 확대/축소
-    # -------------------------
+    # 전경 이미지 확대/축소
     new_width = int(fg.width * scale)
     new_height = int(fg.height * scale)
     fg = fg.resize((new_width, new_height), Image.LANCZOS)
 
-    # -------------------------
-    # ② 전경 이미지 위치 이동
-    # -------------------------
+    # 전경 이미지 위치 이동
     bg.paste(fg, (pos_x, pos_y), fg)
 
     return bg
@@ -31,7 +27,7 @@ def main():
     st.set_page_config(page_title="Background Replace Pro", page_icon="🪄")
 
     st.title("🪄 배경제거 + 새 배경 합성기")
-    st.write("전경 이미지 크기 조절과 위치 이동 기능만 포함된 버전입니다!")
+    st.write("전경 이미지 크기 조절과 직관적인 위치 이동 기능 포함!")
 
     fg_file = st.file_uploader("전경 이미지 업로드", type=["png", "jpg", "jpeg"])
     bg_file = st.file_uploader("배경 이미지 업로드", type=["png", "jpg", "jpeg"])
@@ -39,9 +35,11 @@ def main():
     # UI 세팅
     st.sidebar.title("⚙️ 이미지 조정 옵션")
 
-    scale = st.sidebar.slider("전경 이미지 크기 조절", 0.1, 3.0, 1.0, 0.05)
-    pos_x = st.sidebar.slider("X 위치 이동(좌/우)", -500, 500, 0, 5)
-    pos_y = st.sidebar.slider("Y 위치 이동(상/하)", -500, 500, 0, 5)
+    scale = st.sidebar.slider("전경 이미지 크기 조절 (작게 ↔ 크게)", 0.1, 3.0, 1.0, 0.05)
+
+    # 직관적인 위치 이동 슬라이더
+    pos_x = st.sidebar.slider("좌우 이동 (← 왼쪽 / 오른쪽 →)", -500, 500, 0, 5)
+    pos_y = st.sidebar.slider("상하 이동 (↑ 위 / 아래 ↓)", -500, 500, 0, 5)
 
     if fg_file:
         fg_image = Image.open(fg_file).convert("RGBA")
@@ -62,7 +60,7 @@ def main():
 
         st.subheader("🧩 합성 결과")
 
-        # 중앙 기준 보정 + 사용자 조절값 반영
+        # 중앙 기준 + 사용자 조정값 적용
         pos_x_adj = (bg_image.width - removed_fg.width) // 2 + pos_x
         pos_y_adj = (bg_image.height - removed_fg.height) // 2 + pos_y
 
