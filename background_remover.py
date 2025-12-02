@@ -26,8 +26,8 @@ def overlay_image(background, foreground, scale, pos_x, pos_y):
 def main():
     st.set_page_config(page_title="Background Replace Pro", page_icon="🪄")
 
-    st.title("🪄 배경제거 + 새 배경 합성기")
-    st.write("전경 이미지 크기 조절과 직관적인 위치 이동 기능 포함!")
+    st.title("🪄 원하는 배경에 이미지를 합성해보세요!")
+    st.write("이미지 크기 조절과 위치 이동이 가능해요.")
 
     fg_file = st.file_uploader("전경 이미지 업로드", type=["png", "jpg", "jpeg"])
     bg_file = st.file_uploader("배경 이미지 업로드", type=["png", "jpg", "jpeg"])
