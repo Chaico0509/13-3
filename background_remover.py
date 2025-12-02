@@ -1,33 +1,10 @@
 import io
 import streamlit as st
 from rembg import remove
-from PIL import Image, ImageFilter, ImageEnhance
+from PIL import Image
 
 
-def add_shadow(fg, blur=25, offset=(20, 20), shadow_opacity=120):
-    """전경 이미지에 그림자 생성"""
-    # 전경 이미지 사이즈
-    w, h = fg.size
-
-    # 그림자 생성 (검은색 실루엣)
-    shadow = Image.new("RGBA", (w, h), (0, 0, 0, 0))
-    alpha = fg.split()[-1]  # 투명도 채널
-    shadow.putalpha(alpha)
-
-    # 그림자 색 진하게
-    shadow = ImageEnhance.Brightness(shadow).enhance(0.0)  # 완전 검정색
-
-    # 블러 적용
-    shadow = shadow.filter(ImageFilter.GaussianBlur(blur))
-
-    # 그림자 이동 적용된 캔버스
-    shadow_canvas = Image.new("RGBA", (w + offset[0], h + offset[1]), (0, 0, 0, 0))
-    shadow_canvas.paste(shadow, offset)
-
-    return shadow_canvas
-
-
-def overlay_image(background, foreground, scale, pos_x, pos_y, add_shadow_flag):
+def overlay_image(background, foreground, scale, pos_x, pos_y):
     """배경 위에 전경 이미지 합성"""
     bg = background.convert("RGBA")
     fg = foreground.convert("RGBA")
@@ -38,14 +15,6 @@ def overlay_image(background, foreground, scale, pos_x, pos_y, add_shadow_flag):
     new_width = int(fg.width * scale)
     new_height = int(fg.height * scale)
     fg = fg.resize((new_width, new_height), Image.LANCZOS)
-
-    # 그림자 생성
-    if add_shadow_flag:
-        shadow = add_shadow(fg)
-        # 배경에 그림자 먼저 붙여넣기
-        shadow_x = pos_x - 20
-        shadow_y = pos_y - 20
-        bg.paste(shadow, (shadow_x, shadow_y), shadow)
 
     # -------------------------
     # ② 전경 이미지 위치 이동
@@ -61,8 +30,8 @@ def overlay_image(background, foreground, scale, pos_x, pos_y, add_shadow_flag):
 def main():
     st.set_page_config(page_title="Background Replace Pro", page_icon="🪄")
 
-    st.title("🪄 고급 배경제거 + 새 배경 합성기")
-    st.write("전경 이미지 크기 조절, 위치 이동, 그림자 기능까지 완벽 지원!")
+    st.title("🪄 배경제거 + 새 배경 합성기")
+    st.write("전경 이미지 크기 조절과 위치 이동 기능만 포함된 버전입니다!")
 
     fg_file = st.file_uploader("전경 이미지 업로드", type=["png", "jpg", "jpeg"])
     bg_file = st.file_uploader("배경 이미지 업로드", type=["png", "jpg", "jpeg"])
@@ -73,7 +42,6 @@ def main():
     scale = st.sidebar.slider("전경 이미지 크기 조절", 0.1, 3.0, 1.0, 0.05)
     pos_x = st.sidebar.slider("X 위치 이동(좌/우)", -500, 500, 0, 5)
     pos_y = st.sidebar.slider("Y 위치 이동(상/하)", -500, 500, 0, 5)
-    shadow_flag = st.sidebar.checkbox("그림자 자동 생성", value=True)
 
     if fg_file:
         fg_image = Image.open(fg_file).convert("RGBA")
@@ -94,13 +62,13 @@ def main():
 
         st.subheader("🧩 합성 결과")
 
-        # 사용자 위치 기준 보정 (배경 중심 기준)
+        # 중앙 기준 보정 + 사용자 조절값 반영
         pos_x_adj = (bg_image.width - removed_fg.width) // 2 + pos_x
         pos_y_adj = (bg_image.height - removed_fg.height) // 2 + pos_y
 
         with st.spinner("이미지를 합성 중…"):
             result = overlay_image(
-                bg_image, removed_fg, scale, pos_x_adj, pos_y_adj, shadow_flag
+                bg_image, removed_fg, scale, pos_x_adj, pos_y_adj
             )
 
         st.image(result, use_column_width=True)
