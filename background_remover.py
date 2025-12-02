@@ -27,7 +27,7 @@ def main():
     st.set_page_config(page_title="Background Replace Pro", page_icon="🪄")
 
     st.title("🪄 내맘대로 이미지를 합성해보자!")
-    st.write("이미지 크기 조절과 위치 이동이 가능해요.")
+    st.write("이미지 크기 조절과 위치 이동이 가능해요!")
 
     fg_file = st.file_uploader("전경 이미지 업로드", type=["png", "jpg", "jpeg"])
     bg_file = st.file_uploader("배경 이미지 업로드", type=["png", "jpg", "jpeg"])
